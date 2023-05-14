@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-h3usw0def=-=!@l*dl15jmz&6rdc0o(ou!i8s!k=7c0kbiuo#d
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'whatsapp',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +54,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'mchatbot.urls'
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
