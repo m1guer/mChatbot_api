@@ -11,7 +11,6 @@ class Pedido(models.Model):
     status_pedido = models.CharField(
         choices=STATUS_PEDIDO_ESCOLHA, max_length=3, default=SENDO_FEITO)
     hora_pedido = models.DateTimeField(null=True, blank=True)
-    num_pedido = models.IntegerField(blank=True, null=True)
 
 
 class Clients(models.Model):
@@ -27,4 +26,5 @@ class Clients(models.Model):
     forma_de_pagamento = models.CharField(
         max_length=3, choices=FORMA_DE_PAGAMENTO_ESCOLHA, default=DINHEIRO)
     pedido = models.CharField(max_length=260, null=True, blank=True)
-    num_pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    num_pedido = models.ForeignKey(
+        Pedido, on_delete=models.CASCADE, null=True, blank=True)
