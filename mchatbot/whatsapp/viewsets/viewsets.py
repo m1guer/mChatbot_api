@@ -16,7 +16,7 @@ class ClientViewSet(viewsets.ViewSet):
     def sent_message(self, numero, nome):
         url = "https://graph.facebook.com/v16.0/121601520926198/messages"
         headers = {
-            "Authorization": "Bearer EAACDHcMuPpIBAI2ZA4V5LXg62YPWh8FuAlWQSebZBbaHfMZCjui2t5U1yLEULauqJxuC5kki0OlDKxed6W7qt0AoZC8DwJRdL8dAGNgg1kpV9vhSMZALVp2IjQ0HEITjPz9Yn3GRveL70Va1EryPOjZCiAd1ZAc7tMPevc0AdyFKemSaJFb2E5dssImHVZC0H0nz2xM7pRRAuQZDZD",
+            "Authorization": "Bearer EAACDHcMuPpIBAIrtbpsyIi8bCLOn4JLNaiKgGZCCPAAHark0CugEVRh0aOjRZC8h9xbcUpA5yZATZCzWNVZAu2Pp6zvZA7jPXuxMmIyoZBPjeUZAuDPMbb6Q3ZCIzqMpMgmii6IAYZBzEXosZAI4NY2Tw0Wx7tblA8FmpGwgZCP4KY0DnHEBZBF5dZCrwJBtk3a055g8OR0cvdnxccywZDZD",
             "Content-Type": "application/json",
         }
         body = {
@@ -41,10 +41,10 @@ class ClientViewSet(viewsets.ViewSet):
 
         cliente = Clients()
         json_data = request.data
-        name = json_data['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
-        numero = json_data['entry'][0]['changes'][0]['value']['contacts'][0]["wa_id"]
         if request.method == 'POST':
             if 'contacts' in json_data['entry'][0]['changes'][0]['value']:
+                name = json_data['entry'][0]['changes'][0]['value']['contacts'][0]['profile']['name']
+                numero = json_data['entry'][0]['changes'][0]['value']['contacts'][0]["wa_id"]
                 try:
                     verify_numero_exists = Clients.objects.get(
                         numero_whatsapp=numero)
@@ -56,3 +56,32 @@ class ClientViewSet(viewsets.ViewSet):
                     cliente.save()
                     self.sent_message(nome=name, numero=numero)
                     return Response({'status': 'ok'})
+            else:
+                status_message = json_data['entry'][0]['changes'][0]['value']['statuses'][0]['status']
+                status = ''
+                if "sent" in status_message:
+                    status = Clients.SENT
+                elif "delivered" in status_message:
+                    status = Clients.DELIVERIED
+                if 'conversation' in json_data['entry'][0]['changes'][0]['value']['statuses']:
+                    conversation_id = json_data['entry'][0]['changes'][0]['value']['statuses'][0]['conversation']['id']
+                    recipient_id = json_data['entry'][0]['changes'][0]['value']['statuses'][0]['recipient_id']
+                    try:
+                        updateClientsInfo = Clients.objects.get(
+                            numero_whatsapp=recipient_id)
+                        updateClientsInfo.conversation_id = conversation_id
+                        updateClientsInfo.status_mensage = status
+                        updateClientsInfo.save()
+                        return Response({'status': 'ok'})
+                    except Clients.DoesNotExist:
+                        return Response({'status': 'error'})
+                else:
+                    try:
+                        recipient_id = json_data['entry'][0]['changes'][0]['value']['statuses'][0]['recipient_id']
+                        lastStatusMessage = Clients.objects.get(
+                            numero_whatsapp=recipient_id)
+                        lastStatusMessage.status_mensage = Clients.READ
+                        lastStatusMessage.save()
+                        return Response({'status': 'message updated to read'})
+                    except Clients.DoesNotExist:
+                        return Response({'status': 'error'})

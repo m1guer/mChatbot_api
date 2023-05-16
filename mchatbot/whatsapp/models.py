@@ -24,7 +24,7 @@ class Clients(models.Model):
     DELIVERIED = "dvr"
     READ = "rad"
     STATUS_MENSANGEM_ESCOLHA = [
-        (SENT, "Enviada"), (DELIVERIED, "Entregue"), (READ, "LIDA")]
+        (SENT, "Enviada"), (DELIVERIED, "Entregue"), (READ, "Lida")]
     conversation_id = models.CharField(max_length=31, blank=True, null=True)
     numero_whatsapp = models.IntegerField(null=True, blank=True)
     nome = models.CharField(null=True, blank=True, max_length=160)
